@@ -1,4 +1,4 @@
-get5 - Modifited for CSGO League
+get5 - Modified for CSGO League
 ===========================
 
 [Original Get5](https://github.com/splewis/get5)
