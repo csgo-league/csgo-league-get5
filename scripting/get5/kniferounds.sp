@@ -87,29 +87,52 @@ public Action Command_Swap(int client, int args) {
   return Plugin_Handled;
 }
 
-public Action Command_Ct(int client, int args) {
-  if (IsPlayer(client)) {
-    if (GetClientTeam(client) == CS_TEAM_CT)
-      FakeClientCommand(client, "sm_stay");
-    else if (GetClientTeam(client) == CS_TEAM_T)
-      FakeClientCommand(client, "sm_swap");
+public void Command_VoteCt(int client) {
+  // This value is now false.
+  PrintToChatAll("g_bPlayerCanVote value Command_VoteCt() Pre If condition: %b", g_bPlayerCanVote[client]);
+  if (AwaitingKnifeDecision(client)) {
+    // This is still false.
+    PrintToChatAll("g_bPlayerCanVote value Command_VoteCt() Post If condition: %b", g_bPlayerCanVote[client]);
+    if((g_bVoteStart) && (g_bPlayerCanVote[client])) {
+      g_bPlayerCanVote[client] = false;
+      g_iVoteCts++;
+      PrintToChat(client, "Vote CT cast.");
+      return;
+    }
+    else if((g_bVoteStart) && (!g_bPlayerCanVote[client])) {
+      PrintToChat(client, "You have already voted.");
+      return;
+    }
+    else
+    {
+      PrintToChat(client, "UwU");
+      return;
+    }
   }
-
-  LogDebug("cs team = %d", GetClientTeam(client));
-  LogDebug("m_iCoachingTeam = %d", GetEntProp(client, Prop_Send, "m_iCoachingTeam"));
-  LogDebug("m_iPendingTeamNum = %d", GetEntProp(client, Prop_Send, "m_iPendingTeamNum"));
-
-  return Plugin_Handled;
+  return;
 }
 
-public Action Command_T(int client, int args) {
-  if (IsPlayer(client)) {
-    if (GetClientTeam(client) == CS_TEAM_T)
-      FakeClientCommand(client, "sm_stay");
-    else if (GetClientTeam(client) == CS_TEAM_CT)
-      FakeClientCommand(client, "sm_swap");
+public void Command_VoteT(int client) {
+  PrintToChatAll("g_bPlayerCanVote value Command_VoteT() Pre If condition: %b", g_bPlayerCanVote[client]);
+  if (AwaitingKnifeDecision(client)) {
+    PrintToChatAll("g_bPlayerCanVote value Command_VoteT() Post If condition: %b", g_bPlayerCanVote[client]);
+    if((g_bVoteStart) && (g_bPlayerCanVote[client])) {
+      g_bPlayerCanVote[client] = false;
+      g_iVoteTs++;
+      PrintToChat(client, "Vote T cast.");
+      return;
+    }
+    else if((g_bVoteStart) && (!g_bPlayerCanVote[client])) {
+      PrintToChat(client, "You have already voted.");
+      return;
+    }
+    else
+    {
+      PrintToChat(client, "UwU");
+      return;
+    }
   }
-  return Plugin_Handled;
+  return;
 }
 
 public Action Timer_ForceKnifeDecision(Handle timer) {
@@ -118,4 +141,20 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
     Get5_MessageToAll("%t", "TeamLostTimeToDecideInfoMessage",
                       g_FormattedTeamNames[g_KnifeWinnerTeam]);
   }
+}
+
+public Action Timer_VoteSide(Handle timer) {
+  if (g_iVoteCts > g_iVoteTs) {
+    PrintToChatAll("The team has voted for CT.");
+  } else {
+    PrintToChatAll("THe team has voted for T.");
+  }
+  g_bVoteStart = false;
+  g_iVoteCts = 0;
+  g_iVoteTs = 0;
+
+  for (int i = 1; i <= MaxClients; i++) {
+    g_bPlayerCanVote[i] = true;
+  }
+
 }
