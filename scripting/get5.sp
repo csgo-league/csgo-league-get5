@@ -570,7 +570,7 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
   if (StrEqual(command, "say") && g_GameState != Get5State_None) {
     EventLogger_ClientSay(client, sArgs);
   }
-  PrintToChatAll(command);
+  PrintToChatAll(command); 
   PrintToChatAll(sArgs);
   PrintToChatAll("%s", g_GameState);
   if (StrEqual(command, "say") || StrEqual(command, "say_team") && g_GameState == Get5State_WaitingForKnifeRoundDecision) {

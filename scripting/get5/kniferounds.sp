@@ -144,6 +144,7 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 }
 
 public Action Timer_VoteSide(Handle timer) {
+  PrintToChatAll("Are we here yet?");
   if (g_iVoteCts > g_iVoteTs) {
     PrintToChatAll("The team has voted for CT.");
   } else {
