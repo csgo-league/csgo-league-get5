@@ -90,6 +90,12 @@ ConVar g_VersionCvar;
 // Hooked cvars built into csgo
 ConVar g_CoachingEnabledCvar;
 
+/** LOL **/
+bool g_bVoteStart = false;
+int g_iVoteCts = 0;
+int g_iVoteTs = 0;
+bool g_bPlayerCanVote[MAXPLAYERS + 1] = {true, ...};
+
 /** Series config game-state **/
 int g_MapsToWin = 1;  // Maps needed to win the series.
 bool g_BO2Match = false;
@@ -199,12 +205,6 @@ Handle g_OnPreLoadMatchConfig = INVALID_HANDLE;
 Handle g_OnRoundStatsUpdated = INVALID_HANDLE;
 Handle g_OnSeriesInit = INVALID_HANDLE;
 Handle g_OnSeriesResult = INVALID_HANDLE;
-
-/** LOL **/
-bool g_bVoteStart = false;
-int g_iVoteCts = 0;
-int g_iVoteTs = 0;
-bool g_bPlayerCanVote[MAXPLAYERS + 1] = true;
 
 #include "get5/util.sp"
 #include "get5/version.sp"
@@ -362,8 +362,9 @@ public void OnPluginStart() {
   AddAliasedCommand("unpause", Command_Unpause, "Unpauses the game");
   AddAliasedCommand("coach", Command_SmCoach, "Marks a client as a coach for their team");
   AddAliasedCommand("stop", Command_Stop, "Elects to stop the game to reload a backup file");
+  AddAliasedCommand("ct", Command_VoteCt, "Vote for Counter-Terrorist team.");
+  AddAliasedCommand("t", Command_VoteT, "Voted for the terrorist team");
 
-  // RegConsoleCmd("t", Command_VoteT, "Voted for the terrorist team");
   // RegConsoleCmd("ct", Command_VoteCt, "Voted for the counter-terrorist team");
 
   /** Admin/server commands **/
@@ -569,19 +570,6 @@ public void OnClientPutInServer(int client) {
 public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs) {
   if (StrEqual(command, "say") && g_GameState != Get5State_None) {
     EventLogger_ClientSay(client, sArgs);
-  }
-  PrintToChatAll(command); 
-  PrintToChatAll(sArgs);
-  PrintToChatAll("%s", g_GameState);
-  if (StrEqual(command, "say") || StrEqual(command, "say_team") && g_GameState == Get5State_WaitingForKnifeRoundDecision) {
-    if (StrEqual(sArgs, "ct")) {
-      Command_VoteCt(client);
-    }
-
-    if (StrEqual(sArgs, "t")) {
-      PrintToChatAll("I have matched.");
-      Command_VoteT(client);
-    }
   }
   CheckForChatAlias(client, command, sArgs);
 }
@@ -1185,8 +1173,6 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
     g_KnifeWinnerTeam = CSTeamToMatchTeam(winningCSTeam);
     Get5_MessageToTeam(g_KnifeWinnerTeam, "Say \"t\" or \"ct\" in the next 15 seconds to vote for your starting side");
     g_bVoteStart = true;
-    // This value is true.
-    PrintToChatAll("g_bPlayerCanVote value Event_RoundEnd(): %b", g_bPlayerCanVote);
     CreateTimer(15.0, Timer_VoteSide);
     // Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",
     //                   g_FormattedTeamNames[g_KnifeWinnerTeam]);
