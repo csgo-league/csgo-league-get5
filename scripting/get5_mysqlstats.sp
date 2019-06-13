@@ -1,8 +1,7 @@
 // Modified from https://github.com/splewis/get5
 
-#include <cstrike>
 #include <sourcemod>
-
+#include <cstrike>
 #include "get5/version.sp"
 #include <get5>
 #include <logdebug>
@@ -20,11 +19,11 @@ ConVar g_ForceMatchIDCvar;
 bool g_DisableStats = false;
 
 public Plugin myinfo = {
-  name = "Get5 MySQL stats",
-  author = "splewis",
+  name = "[League] Matches",
+  author = "splewis, B3none",
   description = "Records match stats collected by get5 to MySQL",
   version = PLUGIN_VERSION,
-  url = "https://github.com/csgo-leagie"
+  url = "https://github.com/csgo-league"
 };
 
 public void OnPluginStart() {
@@ -79,7 +78,7 @@ public void Get5_OnSeriesInit() {
   if (g_ForceMatchIDCvar.IntValue > 0) {
     SetMatchID(g_ForceMatchIDCvar.IntValue);
     g_ForceMatchIDCvar.IntValue = 0;
-    Format(queryBuffer, sizeof(queryBuffer), "INSERT INTO `get5_stats_matches` \
+    Format(queryBuffer, sizeof(queryBuffer), "INSERT INTO `matches` \
             (matchid, series_type, team1_name, team2_name, start_time) VALUES \
             (%d, '%s', '%s', '%s', NOW())",
            g_MatchID, seriesTypeSz, team1NameSz, team2NameSz);
@@ -90,7 +89,7 @@ public void Get5_OnSeriesInit() {
   } else {
     Transaction t = SQL_CreateTransaction();
 
-    Format(queryBuffer, sizeof(queryBuffer), "INSERT INTO `get5_stats_matches` \
+    Format(queryBuffer, sizeof(queryBuffer), "INSERT INTO `matches` \
             (series_type, team1_name, team2_name, start_time) VALUES \
             ('%s', '%s', '%s', NOW())",
            seriesTypeSz, team1NameSz, team2NameSz);
@@ -140,7 +139,7 @@ public void Get5_OnGoingLive(int mapNumber) {
   char mapNameSz[sizeof(mapName) * 2 + 1];
   db.Escape(mapName, mapNameSz, sizeof(mapNameSz));
 
-  Format(queryBuffer, sizeof(queryBuffer), "INSERT IGNORE INTO `get5_stats_maps` \
+  Format(queryBuffer, sizeof(queryBuffer), "INSERT IGNORE INTO `maps` \
         (matchid, mapnumber, mapname, start_time) VALUES \
         (%d, %d, '%s', NOW())",
          g_MatchID, mapNumber, mapNameSz);
@@ -154,7 +153,7 @@ public void UpdateRoundStats(int mapNumber) {
   int t1score = CS_GetTeamScore(Get5_MatchTeamToCSTeam(MatchTeam_Team1));
   int t2score = CS_GetTeamScore(Get5_MatchTeamToCSTeam(MatchTeam_Team2));
 
-  Format(queryBuffer, sizeof(queryBuffer), "UPDATE `get5_stats_maps` \
+  Format(queryBuffer, sizeof(queryBuffer), "UPDATE `maps` \
         SET team1_score = %d, team2_score = %d WHERE matchid = %d and mapnumber = %d",
          t1score, t2score, g_MatchID, mapNumber);
   LogDebug(queryBuffer);
@@ -188,7 +187,7 @@ public void Get5_OnMapResult(const char[] map, MatchTeam mapWinner, int team1Sco
   char winnerString[64];
   GetTeamString(mapWinner, winnerString, sizeof(winnerString));
   Format(queryBuffer, sizeof(queryBuffer),
-         "UPDATE `get5_stats_maps` SET winner = '%s', end_time = NOW() \
+         "UPDATE `maps` SET winner = '%s', end_time = NOW() \
         WHERE matchid = %d and mapnumber = %d",
          winnerString, g_MatchID, mapNumber);
   LogDebug(queryBuffer);
@@ -199,7 +198,7 @@ public void Get5_OnMapResult(const char[] map, MatchTeam mapWinner, int team1Sco
   Get5_GetTeamScores(MatchTeam_Team1, t1_seriesscore, tmp);
   Get5_GetTeamScores(MatchTeam_Team2, t2_seriesscore, tmp);
 
-  Format(queryBuffer, sizeof(queryBuffer), "UPDATE `get5_stats_matches` \
+  Format(queryBuffer, sizeof(queryBuffer), "UPDATE `matches` \
         SET team1_score = %d, team2_score = %d WHERE matchid = %d",
          t1_seriesscore, t2_seriesscore, g_MatchID);
   LogDebug(queryBuffer);
@@ -249,7 +248,7 @@ public void AddPlayerStats(KeyValues kv, MatchTeam team) {
 
       // TODO: this should really get split up somehow. Once it hits 32-arguments
       // (aka just a few more) it will cause runtime errors and the Format will fail.
-      Format(queryBuffer, sizeof(queryBuffer), "REPLACE INTO `get5_stats_players` \
+      Format(queryBuffer, sizeof(queryBuffer), "REPLACE INTO `match_players` \
                 (matchid, mapnumber, steamid64, team, \
                 rounds_played, name, kills, deaths, flashbang_assists, \
                 assists, teamkills, headshot_kills, damage, \
@@ -284,7 +283,7 @@ public void Get5_OnSeriesResult(MatchTeam seriesWinner, int team1MapScore, int t
   char winnerString[64];
   GetTeamString(seriesWinner, winnerString, sizeof(winnerString));
 
-  Format(queryBuffer, sizeof(queryBuffer), "UPDATE `get5_stats_matches` \
+  Format(queryBuffer, sizeof(queryBuffer), "UPDATE `matches` \
         SET winner = '%s', team1_score = %d, team2_score = %d, end_time = NOW() \
         WHERE matchid = %d",
          winnerString, team1MapScore, team2MapScore, g_MatchID);
