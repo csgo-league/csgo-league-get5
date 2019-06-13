@@ -38,27 +38,23 @@ int g_MatchID = -1;
 ConVar g_ForceMatchIDCvar;
 bool g_DisableStats = false;
 
-// clang-format off
 public Plugin myinfo = {
   name = "Get5 MySQL stats",
   author = "splewis",
   description = "Records match stats collected by get5 to MySQL",
   version = PLUGIN_VERSION,
-  url = "https://github.com/splewis/get5"
+  url = "https://github.com/csgo-leagie"
 };
-// clang-format on
 
 public void OnPluginStart() {
   InitDebugLog("get5_debug", "get5_mysql");
 
-  g_ForceMatchIDCvar = CreateConVar(
-      "get5_mysql_force_matchid", "0",
-      "If set to a positive integer, this will force get5 to use the matchid in this convar");
+  g_ForceMatchIDCvar = CreateConVar("get5_mysql_force_matchid", "0", "If set to a positive integer, this will force get5 to use the matchid in this convar");
 
   char error[255];
-  db = SQL_Connect("get5", true, error, sizeof(error));
+  db = SQL_Connect("league", true, error, sizeof(error));
   if (db == null) {
-    SetFailState("Could not connect to get5 database: %s", error);
+    SetFailState("Could not connect to league database: %s", error);
   } else {
     g_DisableStats = false;
     db.SetCharset("utf8");
@@ -110,7 +106,6 @@ public void Get5_OnSeriesInit() {
     db.Query(SQLErrorCheckCallback, queryBuffer);
 
     LogMessage("Starting match id %d", g_MatchID);
-
   } else {
     Transaction t = SQL_CreateTransaction();
 
@@ -141,8 +136,7 @@ public void MatchInitSuccess(Database database, any data, int numQueries, Handle
   }
 }
 
-public void MatchInitFailure(Database database, any data, int numQueries, const char[] error,
-                      int failIndex, any[] queryData) {
+public void MatchInitFailure(Database database, any data, int numQueries, const char[] error, int failIndex, any[] queryData) {
   LogError("Failed match creation query, error = %s", error);
   g_DisableStats = true;
 }
@@ -155,8 +149,9 @@ static void SetMatchID(int matchid) {
 }
 
 public void Get5_OnGoingLive(int mapNumber) {
-  if (g_DisableStats)
+  if (g_DisableStats) {
     return;
+  }
 
   char mapName[255];
   GetCurrentMap(mapName, sizeof(mapName));
@@ -203,10 +198,10 @@ public void UpdateRoundStats(int mapNumber) {
   delete kv;
 }
 
-public void Get5_OnMapResult(const char[] map, MatchTeam mapWinner, int team1Score, int team2Score,
-                      int mapNumber) {
-  if (g_DisableStats)
+public void Get5_OnMapResult(const char[] map, MatchTeam mapWinner, int team1Score, int team2Score, int mapNumber) {
+  if (g_DisableStats) {
     return;
+  }
 
   // Update the map winner
   char winnerString[64];
@@ -295,15 +290,15 @@ public void AddPlayerStats(KeyValues kv, MatchTeam team) {
 
       LogDebug(queryBuffer);
       db.Query(SQLErrorCheckCallback, queryBuffer);
-
     } while (kv.GotoNextKey());
     kv.GoBack();
   }
 }
 
 public void Get5_OnSeriesResult(MatchTeam seriesWinner, int team1MapScore, int team2MapScore) {
-  if (g_DisableStats)
+  if (g_DisableStats) {
     return;
+  }
 
   char winnerString[64];
   GetTeamString(seriesWinner, winnerString, sizeof(winnerString));
