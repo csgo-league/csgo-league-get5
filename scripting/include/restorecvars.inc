@@ -13,7 +13,7 @@ stock Handle SaveCvars(ArrayList cvarNames) {
     cvarNames.GetString(i, nameBuffer, sizeof(nameBuffer));
 
     Handle cvar = FindConVar(nameBuffer);
-    if (cvar != INVALID_HANDLE) {
+    if (cvar != null) {
       GetConVarString(cvar, valueBuffer, sizeof(valueBuffer));
       cvarNameList.PushString(nameBuffer);
       cvarValueList.PushString(valueBuffer);
@@ -37,7 +37,7 @@ stock void RestoreCvars(Handle& cvarStorage, bool close = true) {
     cvarValueList.GetString(i, value, sizeof(value));
 
     Handle cvar = FindConVar(name);
-    if (cvar != INVALID_HANDLE) {
+    if (cvar != null) {
       SetConVarString(cvar, value);
     }
   }
@@ -49,14 +49,14 @@ stock void RestoreCvars(Handle& cvarStorage, bool close = true) {
 
 // Closes a cvar storage object returned by SaveCvars.
 stock void CloseCvarStorage(Handle& cvarStorage) {
-  if (cvarStorage == INVALID_HANDLE) {
+  if (cvarStorage == null) {
     return;
   }
 
   CloseHandle(GetArrayCell(cvarStorage, 0));
   CloseHandle(GetArrayCell(cvarStorage, 1));
   CloseHandle(cvarStorage);
-  cvarStorage = INVALID_HANDLE;
+  cvarStorage = null;
 }
 
 // Returns the first "word" in a line, as seperated by whitespace.
@@ -108,6 +108,6 @@ stock Handle ExecuteAndSaveCvars(const char[] cfgFile) {
     return ret;
   } else {
     LogError("Failed to open file for reading: %s", filePath);
-    return INVALID_HANDLE;
+    return null;
   }
 }

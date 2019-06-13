@@ -187,24 +187,24 @@ bool g_MapChangePending = false;
 bool g_MovingClientToCoach[MAXPLAYERS + 1];
 bool g_PendingSideSwap = false;
 
-Handle g_KnifeChangedCvars = INVALID_HANDLE;
-Handle g_MatchConfigChangedCvars = INVALID_HANDLE;
+Handle g_KnifeChangedCvars = null;
+Handle g_MatchConfigChangedCvars = null;
 
 /** Forwards **/
-Handle g_OnBackupRestore = INVALID_HANDLE;
-Handle g_OnDemoFinished = INVALID_HANDLE;
-Handle g_OnEvent = INVALID_HANDLE;
-Handle g_OnGameStateChanged = INVALID_HANDLE;
-Handle g_OnGoingLive = INVALID_HANDLE;
-Handle g_OnLoadMatchConfigFailed = INVALID_HANDLE;
-Handle g_OnMapPicked = INVALID_HANDLE;
-Handle g_OnMapResult = INVALID_HANDLE;
-Handle g_OnMapVetoed = INVALID_HANDLE;
-Handle g_OnSidePicked = INVALID_HANDLE;
-Handle g_OnPreLoadMatchConfig = INVALID_HANDLE;
-Handle g_OnRoundStatsUpdated = INVALID_HANDLE;
-Handle g_OnSeriesInit = INVALID_HANDLE;
-Handle g_OnSeriesResult = INVALID_HANDLE;
+Handle g_OnBackupRestore = null;
+Handle g_OnDemoFinished = null;
+Handle g_OnEvent = null;
+Handle g_OnGameStateChanged = null;
+Handle g_OnGoingLive = null;
+Handle g_OnLoadMatchConfigFailed = null;
+Handle g_OnMapPicked = null;
+Handle g_OnMapResult = null;
+Handle g_OnMapVetoed = null;
+Handle g_OnSidePicked = null;
+Handle g_OnPreLoadMatchConfig = null;
+Handle g_OnRoundStatsUpdated = null;
+Handle g_OnSeriesInit = null;
+Handle g_OnSeriesResult = null;
 
 #include "get5/util.sp"
 #include "get5/version.sp"
@@ -1288,7 +1288,7 @@ public void StartGame(bool knifeRound) {
   if (knifeRound) {
     LogDebug("StartGame: about to begin knife round");
     ChangeState(Get5State_KnifeRound);
-    if (g_KnifeChangedCvars != INVALID_HANDLE) {
+    if (g_KnifeChangedCvars != null) {
       CloseCvarStorage(g_KnifeChangedCvars);
     }
     g_KnifeChangedCvars = ExecuteAndSaveCvars(KNIFE_CONFIG);
@@ -1301,7 +1301,7 @@ public void StartGame(bool knifeRound) {
 }
 
 public Action Timer_PostKnife(Handle timer) {
-  if (g_KnifeChangedCvars != INVALID_HANDLE) {
+  if (g_KnifeChangedCvars != null) {
     RestoreCvars(g_KnifeChangedCvars, true);
     
   }

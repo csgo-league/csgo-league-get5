@@ -225,7 +225,7 @@ public int Native_IncreasePlayerStat(Handle plugin, int numParams) {
 
 public int Native_GetMatchStats(Handle plugin, int numParams) {
   Handle output = GetNativeCell(1);
-  if (output == INVALID_HANDLE) {
+  if (output == null) {
     return view_as<int>(false);
   } else {
     KvCopySubkeys(g_StatsKv, output);

@@ -211,7 +211,7 @@ stock bool LoadMatchFromUrl(const char[] url, ArrayList paramNames = null,
     }
     LogDebug("cleanedUrl (SteamWorks) = %s", cleanedUrl);
     Handle request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodGET, cleanedUrl);
-    if (request == INVALID_HANDLE) {
+    if (request == null) {
       MatchConfigFail("Failed to create HTTP GET request");
       return false;
     }
@@ -693,7 +693,7 @@ public MatchTeam GetMapWinner(int mapNumber) {
 
 public void ExecuteMatchConfigCvars() {
   // Save the original match cvar values if we haven't already.
-  if (g_MatchConfigChangedCvars == INVALID_HANDLE) {
+  if (g_MatchConfigChangedCvars == null) {
     g_MatchConfigChangedCvars = SaveCvars(g_CvarNames);
   }
 
