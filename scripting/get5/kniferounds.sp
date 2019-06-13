@@ -66,6 +66,8 @@ static bool AwaitingKnifeDecision(int client) {
   return waiting && (onWinningTeam || admin);
 }
 
+// If everyone on the winning team has already voted
+// Call HandleVotes();
 public Action Command_VoteCt(int client, int args) {
   if (AwaitingKnifeDecision(client)) {
     if (g_bVoteStart && g_bPlayerCanVote[client]) {
@@ -82,6 +84,8 @@ public Action Command_VoteCt(int client, int args) {
   return Plugin_Handled;
 }
 
+// If everyone on the winning team has already voted
+// Call HandleVotes();
 public Action Command_VoteT(int client, int args) {
   if (AwaitingKnifeDecision(client)) {
     if (g_bVoteStart && g_bPlayerCanVote[client]) {
