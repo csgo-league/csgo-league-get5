@@ -130,7 +130,7 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 public Action Timer_VoteSide(Handle timer) {
   if (g_iVoteCts > g_iVoteTs) {
     PrintToChatAll("CT WON THE VOTE");
-    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam) 
+    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam); 
     PrintToChatAll("g_KnifeWinnerTeam value %s", winner);
     if (winner == CS_TEAM_CT) {
       EndKnifeRound(false);
@@ -141,7 +141,7 @@ public Action Timer_VoteSide(Handle timer) {
     } 
   } else if (g_iVoteTs > g_iVoteCts) {
     PrintToChatAll("Ts Won The Vote");
-    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam) 
+    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam);
     PrintToChatAll("g_KnifeWinnerTeam value %s", winner);
     if (winner == CS_TEAM_T) {
       EndKnifeRound(false);
