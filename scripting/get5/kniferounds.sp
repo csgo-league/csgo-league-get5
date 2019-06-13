@@ -129,8 +129,9 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 
 //TODO: Refactor this meme.
 public Action Timer_VoteSide(Handle timer) {
+  int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam);
+
   if (g_iVoteCts > g_iVoteTs) {
-    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam); 
     if (winner == CS_TEAM_CT) {
       Get5_MessageToAll("%t", "TeamDecidedToStayInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(false);
@@ -139,7 +140,6 @@ public Action Timer_VoteSide(Handle timer) {
       EndKnifeRound(true);
     } 
   } else if (g_iVoteTs > g_iVoteCts) {
-    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam);
     if (winner == CS_TEAM_T) {
       Get5_MessageToAll("%t", "TeamDecidedToStayInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(false);
