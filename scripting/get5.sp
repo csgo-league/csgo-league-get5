@@ -95,6 +95,7 @@ bool g_bVoteStart = false;
 int g_iVoteCts = 0;
 int g_iVoteTs = 0;
 bool g_bPlayerCanVote[MAXPLAYERS + 1] = {true, ...};
+Handle g_bSideVoteTimer = null;
 
 /** Series config game-state **/
 int g_MapsToWin = 1;  // Maps needed to win the series.
@@ -1176,7 +1177,7 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
     Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",g_FormattedTeamNames[g_KnifeWinnerTeam]);
     Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteMessage");
     g_bVoteStart = true;
-    CreateTimer(15.0, Timer_VoteSide);
+    g_bSideVoteTimer = CreateTimer(15.0, Timer_VoteSide);
 
     // if (g_TeamTimeToKnifeDecisionCvar.FloatValue > 0)
     //   CreateTimer(g_TeamTimeToKnifeDecisionCvar.FloatValue, Timer_ForceKnifeDecision);
