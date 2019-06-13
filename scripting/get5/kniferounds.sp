@@ -84,7 +84,6 @@ public Action Command_VoteCt(int client, int args) {
 
         if (runFinal) {
           HandleVotes();
-          delete g_bSideVoteTimer;
         }
     } else if(g_bVoteStart && !g_bPlayerCanVote[client]) {
       Get5_Message(client, "%t", "VoteAlreadyCast");
@@ -114,7 +113,6 @@ public Action Command_VoteT(int client, int args) {
 
       if (runFinal) {
         HandleVotes();
-        delete g_bSideVoteTimer;
       }
     } else if(g_bVoteStart && !g_bPlayerCanVote[client]) {
       Get5_Message(client, "%t", "VoteAlreadyCast");
@@ -156,11 +154,12 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 
 public Action Timer_VoteSide(Handle timer) {
     HandleVotes();
-    delete g_bSideVoteTimer;
 }
 
 //TODO: Refactor.
 void HandleVotes() {
+  delete g_bSideVoteTimer;
+
   int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam);
 
   if (g_iVoteCts > g_iVoteTs) {
