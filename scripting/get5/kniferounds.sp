@@ -130,7 +130,6 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 //TODO: Refactor this meme.
 public Action Timer_VoteSide(Handle timer) {
   if (g_iVoteCts > g_iVoteTs) {
-    PrintToChatAll("CT WON THE VOTE");
     int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam); 
     if (winner == CS_TEAM_CT) {
       Get5_MessageToAll("%t", "TeamDecidedToStayInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);

@@ -567,11 +567,9 @@ public void OnClientSayCommand_Post(int client, const char[] command, const char
   }
 
   if ((StrEqual(command, "say") || StrEqual(command, "say_team")) && g_GameState == Get5State_WaitingForKnifeRoundDecision) {
-    PrintToChatAll("sArgs %s", sArgs);
-    if (strcmp(sArgs, "ct", false)) {
+    if (StrEqual(sArgs, "ct", false)) {
       FakeClientCommand(client, "sm_ct");
-    }
-    if (strcmp(sArgs, "t", false)) {
+    } else if (StrEqual(sArgs, "t", false)) {
       FakeClientCommand(client, "sm_t");
     }
   }
