@@ -119,54 +119,6 @@ public Action Command_VoteT(int client, int args) {
 //   return Plugin_Handled;
 // }
 
-// public void Command_VoteCt(int client) {
-//   // This value is now false.
-//   PrintToChatAll("g_bPlayerCanVote value Command_VoteCt() Pre If condition: %b", g_bPlayerCanVote[client]);
-//   if (AwaitingKnifeDecision(client)) {
-//     // This is still false.
-//     PrintToChatAll("g_bPlayerCanVote value Command_VoteCt() Post If condition: %b", g_bPlayerCanVote[client]);
-//     if(g_bPlayerCanVote[client]) {
-//       g_bPlayerCanVote[client] = false;
-//       g_iVoteCts++;
-//       PrintToChat(client, "Vote CT cast.");
-//       return;
-//     }
-//     else if((g_bVoteStart) && !g_bPlayerCanVote[client]) {
-//       PrintToChat(client, "You have already voted.");
-//       return;
-//     }
-//     else
-//     {
-//       PrintToChat(client, "UwU");
-//       return;
-//     }
-//   }
-//   return;
-// }
-
-// public void Command_VoteT(int client) {
-//   PrintToChatAll("g_bPlayerCanVote value Command_VoteT() Pre If condition: %b", g_bPlayerCanVote[client]);
-//   if (AwaitingKnifeDecision(client)) {
-//     PrintToChatAll("g_bPlayerCanVote value Command_VoteT() Post If condition: %b", g_bPlayerCanVote[client]);
-//     if(g_bPlayerCanVote[client]) {
-//       g_bPlayerCanVote[client] = false;
-//       g_iVoteTs++;
-//       PrintToChat(client, "Vote T cast.");
-//       return;
-//     }
-//     else if(g_bVoteStart && !g_bPlayerCanVote[client]) {
-//       PrintToChat(client, "You have already voted.");
-//       return;
-//     }
-//     else
-//     {
-//       PrintToChat(client, "UwU");
-//       return;
-//     }
-//   }
-//   return;
-// }
-
 public Action Timer_ForceKnifeDecision(Handle timer) {
   if (g_GameState == Get5State_WaitingForKnifeRoundDecision) {
     EndKnifeRound(false);
@@ -177,9 +129,12 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 
 public Action Timer_VoteSide(Handle timer) {
   if (g_iVoteCts > g_iVoteTs) {
-    PrintToChatAll("The team has voted for CT.");
-  } else {
-    PrintToChatAll("The team has voted for T.");
+    if (g_KnifeWinnerTeam == CS_TEAM_CT) {
+      EndKnifeRound(false);
+    }
+    if (g_KnifeWinnerTeam == CS_TEAM_T) {
+      EndKnifeRound(true);
+    }
   }
   g_bVoteStart = false;
   g_iVoteCts = 0;
