@@ -68,12 +68,12 @@ static bool AwaitingKnifeDecision(int client) {
 
 public Action Command_VoteCt(int client, int args) {
   if (AwaitingKnifeDecision(client)) {
-    if ((g_bVoteStart) && (g_bPlayerCanVote[client])) {
+    if (g_bVoteStart && g_bPlayerCanVote[client]) {
       g_bPlayerCanVote[client] = false;
       g_iVoteCts++;
       Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteCTCast");
-    } else if((g_bVoteStart) && (!g_bPlayerCanVote[client])) {
-        Get5_Message(client, "%t", "VoteAlreadyCast");
+    } else if(g_bVoteStart && !g_bPlayerCanVote[client]) {
+      Get5_Message(client, "%t", "VoteAlreadyCast");
     } else {
       return Plugin_Stop;
     }
@@ -84,12 +84,12 @@ public Action Command_VoteCt(int client, int args) {
 
 public Action Command_VoteT(int client, int args) {
   if (AwaitingKnifeDecision(client)) {
-    if ((g_bVoteStart) && (g_bPlayerCanVote[client])) {
+    if (g_bVoteStart && g_bPlayerCanVote[client]) {
       g_bPlayerCanVote[client] = false;
       g_iVoteTs++;
       Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteTCast");
-    } else if((g_bVoteStart) && (!g_bPlayerCanVote[client])) {
-        Get5_Message(client, "%t", "VoteAlreadyCast");
+    } else if(g_bVoteStart && !g_bPlayerCanVote[client]) {
+      Get5_Message(client, "%t", "VoteAlreadyCast");
     } else {
       return Plugin_Stop;
     }
@@ -122,13 +122,16 @@ public Action Command_VoteT(int client, int args) {
 public Action Timer_ForceKnifeDecision(Handle timer) {
   if (g_GameState == Get5State_WaitingForKnifeRoundDecision) {
     EndKnifeRound(false);
-    Get5_MessageToAll("%t", "TeamLostTimeToDecideInfoMessage",
-                      g_FormattedTeamNames[g_KnifeWinnerTeam]);
+    Get5_MessageToAll("%t", "TeamLostTimeToDecideInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
   }
 }
 
-//TODO: Refactor this meme.
 public Action Timer_VoteSide(Handle timer) {
+    HandleVotes();
+}
+
+//TODO: Refactor.
+void HandleVotes() {
   int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam);
 
   if (g_iVoteCts > g_iVoteTs) {
@@ -138,7 +141,7 @@ public Action Timer_VoteSide(Handle timer) {
     } else if (winner == CS_TEAM_T) {
       Get5_MessageToAll("%t", "TeamDecidedToSwapInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(true);
-    } 
+    }
   } else if (g_iVoteTs > g_iVoteCts) {
     if (winner == CS_TEAM_T) {
       Get5_MessageToAll("%t", "TeamDecidedToStayInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
