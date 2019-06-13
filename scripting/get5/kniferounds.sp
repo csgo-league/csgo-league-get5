@@ -129,12 +129,31 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
 
 public Action Timer_VoteSide(Handle timer) {
   if (g_iVoteCts > g_iVoteTs) {
-    if (g_KnifeWinnerTeam == CS_TEAM_CT) {
+    PrintToChatAll("CT WON THE VOTE");
+    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam) 
+    PrintToChatAll("g_KnifeWinnerTeam value %s", winner);
+    if (winner == CS_TEAM_CT) {
       EndKnifeRound(false);
     }
-    if (g_KnifeWinnerTeam == CS_TEAM_T) {
+
+    if (winner == CS_TEAM_T) {
+      EndKnifeRound(true);
+    } 
+  } else if (g_iVoteTs > g_iVoteCts) {
+    PrintToChatAll("Ts Won The Vote");
+    int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam) 
+    PrintToChatAll("g_KnifeWinnerTeam value %s", winner);
+    if (winner == CS_TEAM_T) {
+      EndKnifeRound(false);
+    }
+
+    if (winner == CS_TEAM_CT) {
       EndKnifeRound(true);
     }
+  } else {
+    PrintToChatAll("THE VOTE IS EVEN");
+    PrintToChatAll("g_KnifeWinnerTeam value %s", g_KnifeWinnerTeam);
+    EndKnifeRound(false);
   }
   g_bVoteStart = false;
   g_iVoteCts = 0;
@@ -143,5 +162,4 @@ public Action Timer_VoteSide(Handle timer) {
   for (int i = 1; i <= MaxClients; i++) {
     g_bPlayerCanVote[i] = true;
   }
-
 }
