@@ -71,9 +71,9 @@ public Action Command_VoteCt(int client, int args) {
     if ((g_bVoteStart) && (g_bPlayerCanVote[client])) {
       g_bPlayerCanVote[client] = false;
       g_iVoteCts++;
-      PrintToChat(client, "Vote CT cast.");
+      Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteCTCast");
     } else if((g_bVoteStart) && (!g_bPlayerCanVote[client])) {
-        PrintToChat(client, "You have already voted.");
+        Get5_Message(client, "%t", "VoteAlreadyCast");
     } else {
       return Plugin_Stop;
     }
@@ -87,9 +87,9 @@ public Action Command_VoteT(int client, int args) {
     if ((g_bVoteStart) && (g_bPlayerCanVote[client])) {
       g_bPlayerCanVote[client] = false;
       g_iVoteTs++;
-      PrintToChat(client, "Vote T cast.");
+      Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteTCast");
     } else if((g_bVoteStart) && (!g_bPlayerCanVote[client])) {
-        PrintToChat(client, "You have already voted.");
+        Get5_Message(client, "%t", "VoteAlreadyCast");
     } else {
       return Plugin_Stop;
     }
@@ -127,34 +127,31 @@ public Action Timer_ForceKnifeDecision(Handle timer) {
   }
 }
 
+//TODO: Refactor this meme.
 public Action Timer_VoteSide(Handle timer) {
   if (g_iVoteCts > g_iVoteTs) {
     PrintToChatAll("CT WON THE VOTE");
     int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam); 
-    PrintToChatAll("g_KnifeWinnerTeam value %s", winner);
     if (winner == CS_TEAM_CT) {
+      Get5_MessageToAll("%t", "TeamDecidedToStayInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(false);
-    }
-
-    if (winner == CS_TEAM_T) {
+    } else if (winner == CS_TEAM_T) {
+      Get5_MessageToAll("%t", "TeamDecidedToSwapInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(true);
     } 
   } else if (g_iVoteTs > g_iVoteCts) {
-    PrintToChatAll("Ts Won The Vote");
     int winner = Get5_MatchTeamToCSTeam(g_KnifeWinnerTeam);
-    PrintToChatAll("g_KnifeWinnerTeam value %s", winner);
     if (winner == CS_TEAM_T) {
+      Get5_MessageToAll("%t", "TeamDecidedToStayInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(false);
-    }
-
-    if (winner == CS_TEAM_CT) {
+    } else if (winner == CS_TEAM_CT) {
+      Get5_MessageToAll("%t", "TeamDecidedToSwapInfoMessage", g_FormattedTeamNames[g_KnifeWinnerTeam]);
       EndKnifeRound(true);
     }
   } else {
-    PrintToChatAll("THE VOTE IS EVEN");
-    PrintToChatAll("g_KnifeWinnerTeam value %s", g_KnifeWinnerTeam);
     EndKnifeRound(false);
   }
+
   g_bVoteStart = false;
   g_iVoteCts = 0;
   g_iVoteTs = 0;

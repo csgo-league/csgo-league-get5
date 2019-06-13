@@ -510,12 +510,6 @@ public Action Timer_InfoMessages(Handle timer) {
     Get5_MessageToAll("%t", "WaitingForGOTVVetoInfoMessage");
   }
 
-  // Handle waiting for knife decision
-  if (g_GameState == Get5State_WaitingForKnifeRoundDecision) {
-    // Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",
-    //                   g_FormattedTeamNames[g_KnifeWinnerTeam]);
-  }
-
   // Handle postgame
   if (g_GameState == Get5State_PostGame) {
     Get5_MessageToAll("%t", "WaitingForGOTVBrodcastEndingInfoMessage");
@@ -1181,14 +1175,13 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
     }
 
     g_KnifeWinnerTeam = CSTeamToMatchTeam(winningCSTeam);
-    Get5_MessageToTeam(g_KnifeWinnerTeam, "Say \"t\" or \"ct\" in the next 15 seconds to vote for your starting side");
+    Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",g_FormattedTeamNames[g_KnifeWinnerTeam]);
+    Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteMessage");
     g_bVoteStart = true;
     CreateTimer(15.0, Timer_VoteSide);
-    // Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",
-    //                   g_FormattedTeamNames[g_KnifeWinnerTeam]);
 
-    if (g_TeamTimeToKnifeDecisionCvar.FloatValue > 0)
-      CreateTimer(g_TeamTimeToKnifeDecisionCvar.FloatValue, Timer_ForceKnifeDecision);
+    // if (g_TeamTimeToKnifeDecisionCvar.FloatValue > 0)
+    //   CreateTimer(g_TeamTimeToKnifeDecisionCvar.FloatValue, Timer_ForceKnifeDecision);
   }
 
   if (g_GameState == Get5State_Live) {
