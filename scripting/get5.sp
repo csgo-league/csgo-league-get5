@@ -366,8 +366,6 @@ public void OnPluginStart() {
   AddAliasedCommand("ct", Command_VoteCt, "Vote for Counter-Terrorist team.");
   AddAliasedCommand("t", Command_VoteT, "Voted for the terrorist team");
 
-  // RegConsoleCmd("ct", Command_VoteCt, "Voted for the counter-terrorist team");
-
   /** Admin/server commands **/
   RegAdminCmd(
       "get5_loadmatch", Command_LoadMatch, ADMFLAG_CHANGEMAP,

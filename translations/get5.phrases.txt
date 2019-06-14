@@ -387,11 +387,11 @@
     }
     "VoteCTCast"
     {
-        "en"        "Vote recorded for CT."
+        "en"        "Vote recorded for Counter-Terrorist."
     }
     "VoteTCast"
     {
-        "en"        "Vote recorded for T."
+        "en"        "Vote recorded for Terrorist."
     }
     "VoteAlreadyCast"
     {
