@@ -32,7 +32,7 @@
     "WaitingForEnemySwapInfoMessage"
     {
         "#format"       "{1:s}"
-        "en"            "{1} won the knife round. Waiting for them to type !stay or !swap."
+        "en"            "{1} won the knife round and will now choose sides."
     }
     "WaitingForGOTVBrodcastEndingInfoMessage"
     {
@@ -399,6 +399,6 @@
     }
     "VoteMessage"
     {
-        "en"        "Say \"t\" or \"ct"\ in the next 15 seconds to vote for your starting side."
+        "en"        "Say t or ct in the next 15 seconds to vote for your starting side."
     }
 }
