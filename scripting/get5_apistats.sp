@@ -119,11 +119,11 @@ static Handle CreateRequest(EHTTPMethod httpMethod, const char[] apiMethod, any:
   Handle req = SteamWorks_CreateHTTPRequest(httpMethod, formattedUrl);
   if (StrEqual(g_APIKey, "")) {
     // Not using a web interface.
-    return INVALID_HANDLE;
+    return null;
 
-  } else if (req == INVALID_HANDLE) {
+  } else if (req == null) {
     LogError("Failed to create request to %s", formattedUrl);
-    return INVALID_HANDLE;
+    return null;
 
   } else {
     SteamWorks_SetHTTPCallbacks(req, RequestCallback);
@@ -181,7 +181,7 @@ public void CheckForLogo(const char[] logo) {
   if (!FileExists(logoPath)) {
     LogDebug("Fetching logo for %s", logo);
     Handle req = CreateRequest(k_EHTTPMethodGET, "/static/img/logos/%s.png", logo);
-    if (req == INVALID_HANDLE) {
+    if (req == null) {
       return;
     }
 
@@ -216,7 +216,7 @@ public void Get5_OnGoingLive(int mapNumber) {
   char mapName[64];
   GetCurrentMap(mapName, sizeof(mapName));
   Handle req = CreateRequest(k_EHTTPMethodPOST, "match/%d/map/%d/start", g_MatchID, mapNumber);
-  if (req != INVALID_HANDLE) {
+  if (req != null) {
     AddStringParam(req, "mapname", mapName);
     SteamWorks_SendHTTPRequest(req);
   }
@@ -230,7 +230,7 @@ public void UpdateRoundStats(int mapNumber) {
   int t2score = CS_GetTeamScore(Get5_MatchTeamToCSTeam(MatchTeam_Team2));
 
   Handle req = CreateRequest(k_EHTTPMethodPOST, "match/%d/map/%d/update", g_MatchID, mapNumber);
-  if (req != INVALID_HANDLE) {
+  if (req != null) {
     AddIntParam(req, "team1score", t1score);
     AddIntParam(req, "team2score", t2score);
     SteamWorks_SendHTTPRequest(req);
@@ -261,7 +261,7 @@ public void Get5_OnMapResult(const char[] map, MatchTeam mapWinner, int team1Sco
   GetTeamString(mapWinner, winnerString, sizeof(winnerString));
 
   Handle req = CreateRequest(k_EHTTPMethodPOST, "match/%d/map/%d/finish", g_MatchID, mapNumber);
-  if (req != INVALID_HANDLE) {
+  if (req != null) {
     AddIntParam(req, "team1score", team1Score);
     AddIntParam(req, "team2score", team2Score);
     AddStringParam(req, "winner", winnerString);
@@ -287,7 +287,7 @@ public void UpdatePlayerStats(KeyValues kv, MatchTeam team) {
 
       Handle req = CreateRequest(k_EHTTPMethodPOST, "match/%d/map/%d/player/%s/update", g_MatchID,
                                  mapNumber, auth);
-      if (req != INVALID_HANDLE) {
+      if (req != null) {
         AddStringParam(req, "team", teamString);
         AddStringParam(req, "name", name);
         AddIntStat(req, kv, STAT_KILLS);
@@ -348,7 +348,7 @@ public void Get5_OnSeriesResult(MatchTeam seriesWinner, int team1MapScore, int t
   delete kv;
 
   Handle req = CreateRequest(k_EHTTPMethodPOST, "match/%d/finish", g_MatchID);
-  if (req != INVALID_HANDLE) {
+  if (req != null) {
     AddStringParam(req, "winner", winnerString);
     AddIntParam(req, "forfeit", forfeit);
     SteamWorks_SendHTTPRequest(req);

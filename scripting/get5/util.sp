@@ -229,10 +229,10 @@ stock bool Pause(int pauseTime = 0, int csTeam = CS_TEAM_NONE) {
 stock void Unpause() {
 
   if (GameRules_GetProp("m_bTerroristTimeOutActive") == 1){
-      GameRules_SetPropFloat("m_flTerroristTimeOutRemaining", 0);
+      GameRules_SetPropFloat("m_flTerroristTimeOutRemaining", 0.0);
   }
   else if (GameRules_GetProp("m_bCTTimeOutActive") == 1){
-      GameRules_SetPropFloat("m_flCTTimeOutRemaining", 0);
+      GameRules_SetPropFloat("m_flCTTimeOutRemaining", 0.0);
   }
   else
   {
@@ -702,7 +702,7 @@ stock void DelayFunction(float delay, VoidFunction f) {
 public Action _DelayFunctionCallback(Handle timer, DataPack data) {
   data.Reset();
   Function func = data.ReadFunction();
-  Call_StartFunction(INVALID_HANDLE, func);
+  Call_StartFunction(null, func);
   Call_Finish();
   delete data;
 }

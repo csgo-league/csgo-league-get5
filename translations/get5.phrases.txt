@@ -32,7 +32,7 @@
     "WaitingForEnemySwapInfoMessage"
     {
         "#format"       "{1:s}"
-        "en"            "{1} won the knife round. Waiting for them to type !stay or !swap."
+        "en"            "{1} won the knife round and will now choose sides."
     }
     "WaitingForGOTVBrodcastEndingInfoMessage"
     {
@@ -376,5 +376,29 @@
     {
         "#format"       "{1:i}"
         "en"        "Veto commencing in {GREEN}{1} {NORMAL}seconds."
+    }
+    "OvertimeCommencing"
+    {
+        "en"        "Overtime will be played out."
+    }
+    "MatchDraw"
+    {
+        "en"        "The match will end in a tie."
+    }
+    "VoteCTCast"
+    {
+        "en"        "Vote recorded for Counter-Terrorist."
+    }
+    "VoteTCast"
+    {
+        "en"        "Vote recorded for Terrorist."
+    }
+    "VoteAlreadyCast"
+    {
+        "en"        "You have already voted."
+    }
+    "VoteMessage"
+    {
+        "en"        "Say t or ct in the next 15 seconds to vote for your starting side."
     }
 }

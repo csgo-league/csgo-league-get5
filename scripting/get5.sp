@@ -90,6 +90,13 @@ ConVar g_VersionCvar;
 // Hooked cvars built into csgo
 ConVar g_CoachingEnabledCvar;
 
+/** LOL **/
+bool g_bVoteStart = false;
+int g_iVoteCts = 0;
+int g_iVoteTs = 0;
+bool g_bPlayerCanVote[MAXPLAYERS + 1] = {true, ...};
+Handle g_bSideVoteTimer = null;
+
 /** Series config game-state **/
 int g_MapsToWin = 1;  // Maps needed to win the series.
 bool g_BO2Match = false;
@@ -181,24 +188,24 @@ bool g_MapChangePending = false;
 bool g_MovingClientToCoach[MAXPLAYERS + 1];
 bool g_PendingSideSwap = false;
 
-Handle g_KnifeChangedCvars = INVALID_HANDLE;
-Handle g_MatchConfigChangedCvars = INVALID_HANDLE;
+Handle g_KnifeChangedCvars = null;
+Handle g_MatchConfigChangedCvars = null;
 
 /** Forwards **/
-Handle g_OnBackupRestore = INVALID_HANDLE;
-Handle g_OnDemoFinished = INVALID_HANDLE;
-Handle g_OnEvent = INVALID_HANDLE;
-Handle g_OnGameStateChanged = INVALID_HANDLE;
-Handle g_OnGoingLive = INVALID_HANDLE;
-Handle g_OnLoadMatchConfigFailed = INVALID_HANDLE;
-Handle g_OnMapPicked = INVALID_HANDLE;
-Handle g_OnMapResult = INVALID_HANDLE;
-Handle g_OnMapVetoed = INVALID_HANDLE;
-Handle g_OnSidePicked = INVALID_HANDLE;
-Handle g_OnPreLoadMatchConfig = INVALID_HANDLE;
-Handle g_OnRoundStatsUpdated = INVALID_HANDLE;
-Handle g_OnSeriesInit = INVALID_HANDLE;
-Handle g_OnSeriesResult = INVALID_HANDLE;
+Handle g_OnBackupRestore = null;
+Handle g_OnDemoFinished = null;
+Handle g_OnEvent = null;
+Handle g_OnGameStateChanged = null;
+Handle g_OnGoingLive = null;
+Handle g_OnLoadMatchConfigFailed = null;
+Handle g_OnMapPicked = null;
+Handle g_OnMapResult = null;
+Handle g_OnMapVetoed = null;
+Handle g_OnSidePicked = null;
+Handle g_OnPreLoadMatchConfig = null;
+Handle g_OnRoundStatsUpdated = null;
+Handle g_OnSeriesInit = null;
+Handle g_OnSeriesResult = null;
 
 #include "get5/util.sp"
 #include "get5/version.sp"
@@ -355,13 +362,9 @@ public void OnPluginStart() {
   AddAliasedCommand("pause", Command_Pause, "Pauses the game");
   AddAliasedCommand("unpause", Command_Unpause, "Unpauses the game");
   AddAliasedCommand("coach", Command_SmCoach, "Marks a client as a coach for their team");
-  AddAliasedCommand("stay", Command_Stay,
-                    "Elects to stay on the current team after winning a knife round");
-  AddAliasedCommand("swap", Command_Swap,
-                    "Elects to swap the current teams after winning a knife round");
-  AddAliasedCommand("t", Command_T, "Elects to start on T side after winning a knife round");
-  AddAliasedCommand("ct", Command_Ct, "Elects to start on CT side after winning a knife round");
   AddAliasedCommand("stop", Command_Stop, "Elects to stop the game to reload a backup file");
+  AddAliasedCommand("ct", Command_VoteCt, "Vote for Counter-Terrorist team.");
+  AddAliasedCommand("t", Command_VoteT, "Voted for the terrorist team");
 
   /** Admin/server commands **/
   RegAdminCmd(
@@ -506,12 +509,6 @@ public Action Timer_InfoMessages(Handle timer) {
     Get5_MessageToAll("%t", "WaitingForGOTVVetoInfoMessage");
   }
 
-  // Handle waiting for knife decision
-  if (g_GameState == Get5State_WaitingForKnifeRoundDecision) {
-    Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",
-                      g_FormattedTeamNames[g_KnifeWinnerTeam]);
-  }
-
   // Handle postgame
   if (g_GameState == Get5State_PostGame) {
     Get5_MessageToAll("%t", "WaitingForGOTVBrodcastEndingInfoMessage");
@@ -566,6 +563,14 @@ public void OnClientPutInServer(int client) {
 public void OnClientSayCommand_Post(int client, const char[] command, const char[] sArgs) {
   if (StrEqual(command, "say") && g_GameState != Get5State_None) {
     EventLogger_ClientSay(client, sArgs);
+  }
+
+  if ((StrEqual(command, "say") || StrEqual(command, "say_team")) && g_GameState == Get5State_WaitingForKnifeRoundDecision) {
+    if (StrEqual(sArgs, "ct", false)) {
+      FakeClientCommand(client, "sm_ct");
+    } else if (StrEqual(sArgs, "t", false)) {
+      FakeClientCommand(client, "sm_t");
+    }
   }
   CheckForChatAlias(client, command, sArgs);
 }
@@ -1167,11 +1172,13 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
     }
 
     g_KnifeWinnerTeam = CSTeamToMatchTeam(winningCSTeam);
-    Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",
-                      g_FormattedTeamNames[g_KnifeWinnerTeam]);
+    Get5_MessageToAll("%t", "WaitingForEnemySwapInfoMessage",g_FormattedTeamNames[g_KnifeWinnerTeam]);
+    Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteMessage");
+    g_bVoteStart = true;
+    g_bSideVoteTimer = CreateTimer(15.0, Timer_VoteSide);
 
-    if (g_TeamTimeToKnifeDecisionCvar.FloatValue > 0)
-      CreateTimer(g_TeamTimeToKnifeDecisionCvar.FloatValue, Timer_ForceKnifeDecision);
+    // if (g_TeamTimeToKnifeDecisionCvar.FloatValue > 0)
+    //   CreateTimer(g_TeamTimeToKnifeDecisionCvar.FloatValue, Timer_ForceKnifeDecision);
   }
 
   if (g_GameState == Get5State_Live) {
@@ -1271,7 +1278,7 @@ public void StartGame(bool knifeRound) {
   if (knifeRound) {
     LogDebug("StartGame: about to begin knife round");
     ChangeState(Get5State_KnifeRound);
-    if (g_KnifeChangedCvars != INVALID_HANDLE) {
+    if (g_KnifeChangedCvars != null) {
       CloseCvarStorage(g_KnifeChangedCvars);
     }
     g_KnifeChangedCvars = ExecuteAndSaveCvars(KNIFE_CONFIG);
@@ -1284,10 +1291,10 @@ public void StartGame(bool knifeRound) {
 }
 
 public Action Timer_PostKnife(Handle timer) {
-  if (g_KnifeChangedCvars != INVALID_HANDLE) {
+  if (g_KnifeChangedCvars != null) {
     RestoreCvars(g_KnifeChangedCvars, true);
+    
   }
-
   ExecCfg(g_WarmupCfgCvar);
   EnsurePausedWarmup();
 }
