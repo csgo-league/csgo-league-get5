@@ -537,6 +537,7 @@ static void PrintDamageInfo(int client) {
 
       g_DamagePrintFormat.GetString(message, sizeof(message));
 
+      // Damage color printing. Need to fix values as spoken about in discord.
       GetDamageColor(damageColor, true, g_DamageDone[client][i], g_GotKill[client][i]);
       ReplaceStringWithColoredInt(message, sizeof(message), "{DMG_TO}", g_DamageDone[client][i], damageColor);
       ReplaceStringWithColoredInt(message, sizeof(message), "{HITS_TO}", g_DamageDoneHits[client][i], damageColor);
@@ -545,6 +546,9 @@ static void PrintDamageInfo(int client) {
       ReplaceStringWithColoredInt(message, sizeof(message), "{HITS_FROM}", g_DamageDoneHits[i][client], damageColor);
       
       ReplaceString(message, sizeof(message), "{NAME}", name);
+
+      // Color printing damage: 
+      //Health > 75 = green, Health > 25: Yellow, Health < 25: Red.
       GetHealthColor(healthColor, health);
       ReplaceStringWithColoredInt(message, sizeof(message), "{HEALTH}", health, healthColor);
       
