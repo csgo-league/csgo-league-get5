@@ -1,4 +1,5 @@
 const float kTimeGivenToTrade = 1.5;
+bool g_GotKill[MAXPLAYERS + 1][MAXPLAYERS + 1];
 
 public void Stats_PluginStart() {
   HookEvent("player_death", Stats_PlayerDeathEvent);
@@ -49,6 +50,7 @@ public void Stats_ResetClientRoundValues(int client) {
   for (int i = 1; i <= MaxClients; i++) {
     g_DamageDone[client][i] = 0;
     g_DamageDoneHits[client][i] = 0;
+    g_GotKill[client][i] = false;
   }
 }
 
@@ -188,6 +190,8 @@ public Action Stats_PlayerDeathEvent(Event event, const char[] name, bool dontBr
     IncrementPlayerStat(victim, STAT_DEATHS);
 
     int victim_team = GetClientTeam(victim);
+    g_GotKill[validAttacker][validVictim] = true;
+
     if (!g_TeamFirstDeathDone[victim_team]) {
       g_TeamFirstDeathDone[victim_team] = true;
       IncrementPlayerStat(victim,
@@ -288,6 +292,7 @@ public Action Stats_DamageDealtEvent(Event event, const char[] name, bool dontBr
 
     g_DamageDone[attacker][victim] += damage;
     g_DamageDoneHits[attacker][victim]++;
+    g_GotKill[attacker][victim];
     AddToPlayerStat(attacker, STAT_DAMAGE, damage);
   }
 
@@ -480,6 +485,34 @@ public void DumpToFile() {
   }
 }
 
+static void GetDamageColor(char color[16], bool damageGiven, int damage, bool gotKill) {
+  if (damage == 0) {
+    Format(color, sizeof(color), "NORMAL");
+  } else if (damageGiven) {
+    if (gotKill) {
+      Format(color, sizeof(color), "GREEN");
+    } else {
+      Format(color, sizeof(color), "LIGHT_GREEN");
+    }
+  } else {
+    if (gotKill) {
+      Format(color, sizeof(color), "DARK_RED");
+    } else {
+      Format(color, sizeof(color), "LIGHT_RED");
+    }
+  }
+}
+
+static void GetHealthColor(char color[16], int health) {
+  if (health > 75) {
+    Format(color, sizeof(color), "GREEN");
+  } else if (health > 25) {
+    Format(color, sizeof(color), "YELLOW");
+  } else {
+    Format(color, sizeof(color), "DARK_RED");
+  }
+}
+
 static void PrintDamageInfo(int client) {
   if (!IsPlayer(client))
     return;
@@ -497,16 +530,28 @@ static void PrintDamageInfo(int client) {
       char name[64];
       GetClientName(i, name, sizeof(name));
 
-      g_DamagePrintFormat.GetString(message, sizeof(message));
-      ReplaceStringWithInt(message, sizeof(message), "{DMG_TO}", g_DamageDone[client][i], false);
-      ReplaceStringWithInt(message, sizeof(message), "{HITS_TO}", g_DamageDoneHits[client][i],
-                           false);
-      ReplaceStringWithInt(message, sizeof(message), "{DMG_FROM}", g_DamageDone[i][client], false);
-      ReplaceStringWithInt(message, sizeof(message), "{HITS_FROM}", g_DamageDoneHits[i][client],
-                           false);
-      ReplaceString(message, sizeof(message), "{NAME}", name, false);
-      ReplaceStringWithInt(message, sizeof(message), "{HEALTH}", health, false);
+      Colorize(message, sizeof(message), true);
+      char damageColor[16];
+      char healthColor[16];
 
+      g_DamagePrintFormat.GetString(message, sizeof(message));
+
+      // Damage color printing. Need to fix values as spoken about in discord.
+      GetDamageColor(damageColor, true, g_DamageDone[client][i], g_GotKill[client][i]);
+      ReplaceStringWithColoredInt(message, sizeof(message), "{DMG_TO}", g_DamageDone[client][i], damageColor);
+      ReplaceStringWithColoredInt(message, sizeof(message), "{HITS_TO}", g_DamageDoneHits[client][i], damageColor);
+      
+      GetDamageColor(damageColor, false, g_DamageDone[i][client], g_GotKill[i][client]);
+      ReplaceStringWithColoredInt(message, sizeof(message), "{DMG_FROM}", g_DamageDone[i][client],damageColor);
+      ReplaceStringWithColoredInt(message, sizeof(message), "{HITS_FROM}", g_DamageDoneHits[i][client], damageColor);
+      
+      ReplaceString(message, sizeof(message), "{NAME}", name);
+
+      // Color printing damage: 
+      //Health > 75 = green, Health > 25: Yellow, Health < 25: Red.
+      GetHealthColor(healthColor, health);
+      ReplaceStringWithColoredInt(message, sizeof(message), "{HEALTH}", health, healthColor);
+      
       Colorize(message, sizeof(message));
       PrintToChat(client, message);
     }
