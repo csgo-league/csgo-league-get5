@@ -191,6 +191,7 @@ public Action Stats_PlayerDeathEvent(Event event, const char[] name, bool dontBr
 
     int victim_team = GetClientTeam(victim);
     g_GotKill[validAttacker][validVictim] = true;
+
     if (!g_TeamFirstDeathDone[victim_team]) {
       g_TeamFirstDeathDone[victim_team] = true;
       IncrementPlayerStat(victim,
@@ -505,11 +506,9 @@ static void GetDamageColor(char color[16], bool damageGiven, int damage, bool go
 static void GetHealthColor(char color[16], int health) {
   if (health > 75) {
     Format(color, sizeof(color), "GREEN");
-  }
-  else if (health > 25) {
+  } else if (health > 25) {
     Format(color, sizeof(color), "YELLOW");
-  }
-  else {
+  } else {
     Format(color, sizeof(color), "DARK_RED");
   }
 }
@@ -541,6 +540,7 @@ static void PrintDamageInfo(int client) {
       GetDamageColor(damageColor, true, g_DamageDone[client][i], g_GotKill[client][i]);
       ReplaceStringWithColoredInt(message, sizeof(message), "{DMG_TO}", g_DamageDone[client][i], damageColor);
       ReplaceStringWithColoredInt(message, sizeof(message), "{HITS_TO}", g_DamageDoneHits[client][i], damageColor);
+      
       GetDamageColor(damageColor, false, g_DamageDone[i][client], g_GotKill[i][client]);
       ReplaceStringWithColoredInt(message, sizeof(message), "{DMG_FROM}", g_DamageDone[i][client],damageColor);
       ReplaceStringWithColoredInt(message, sizeof(message), "{HITS_FROM}", g_DamageDoneHits[i][client], damageColor);
