@@ -283,13 +283,6 @@ public Action Stats_DamageDealtEvent(Event event, const char[] name, bool dontBr
     int damage = event.GetInt("dmg_health");
     int postDamageHealth = event.GetInt("health");
 
-    // this maxes the damage variables at 100,
-    // so doing 50 damage when the player had 2 health
-    // only counts as 2 damage.
-    if (postDamageHealth == 0) {
-      damage += preDamageHealth;
-    }
-
     g_DamageDone[attacker][victim] += damage;
     g_DamageDoneHits[attacker][victim]++;
     g_GotKill[attacker][victim];
