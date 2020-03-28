@@ -12,7 +12,7 @@ static void EventLogger_LogEvent(const char[] eventName, JSON_Object params) {
   const int kMaxCharacters = 1000;
   char buffer[2048];
 
-  json.Encode(buffer, sizeof(buffer));
+  json.Encode(buffer, sizeof(buffer), g_PrettyPrintJsonCvar.BoolValue);
   if (strlen(buffer) > kMaxCharacters) {
     LogError("Event JSON too long (%d characters, %d max): %s", eventName, strlen(buffer),
              kMaxCharacters);
@@ -229,4 +229,21 @@ public void EventLogger_PlayerDisconnect(int client) {
   AddMapData(params);
   AddPlayer(params, "client", client);
   EventLogger_EndEvent("player_disconnect");
+}
+
+public void EventLogger_TeamReady(MatchTeam team, const char[] stage) {
+  EventLogger_StartEvent();
+
+  AddTeam(params, "team", team);
+  params.SetString("stage", stage);
+
+  EventLogger_EndEvent("team_ready");
+}
+
+public void EventLogger_TeamUnready(MatchTeam team) {
+  EventLogger_StartEvent();
+
+  AddTeam(params, "team", team);
+
+  EventLogger_EndEvent("team_unready");
 }
