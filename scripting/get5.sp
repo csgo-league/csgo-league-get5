@@ -966,7 +966,7 @@ public Action Event_MatchOver(Event event, const char[] name, bool dontBroadcast
     int t2maps = g_TeamSeriesScores[MatchTeam_Team2];
     int tiedMaps = g_TeamSeriesScores[MatchTeam_TeamNone];
 
-    float minDelay = float(GetTvDelay()) + MATCH_END_DELAY_AFTER_TV;
+    float minDelay = 10.0;
 
     if (t1maps == g_MapsToWin) {
       // Team 1 won
