@@ -74,15 +74,16 @@ public Action Command_VoteCt(int client, int args) {
       Get5_MessageToTeam(g_KnifeWinnerTeam, "%t", "VoteCTCast");
 
       bool runFinal = true;
-        for (int i = 1; i <= MaxClients; i++) {
+      for (int i = 1; i <= MaxClients; i++) {
           if (AwaitingKnifeDecision(i) && g_bPlayerCanVote[i]) {
             runFinal = false;
           }
-        }
-
-        if (runFinal) {
-          HandleVotes();
-        }
+      }
+        
+      if (runFinal) {
+        HandleVotes();
+      }
+      
     } else if(g_bVoteStart && !g_bPlayerCanVote[client]) {
       Get5_Message(client, "%t", "VoteAlreadyCast");
     } else {

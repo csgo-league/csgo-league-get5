@@ -279,13 +279,11 @@ public Action Stats_DamageDealtEvent(Event event, const char[] name, bool dontBr
   bool validVictim = IsValidClient(victim);
 
   if (validAttacker && validVictim) {
-    int preDamageHealth = GetClientHealth(victim);
     int damage = event.GetInt("dmg_health");
-    int postDamageHealth = event.GetInt("health");
 
     g_DamageDone[attacker][victim] += damage;
     g_DamageDoneHits[attacker][victim]++;
-    g_GotKill[attacker][victim];
+    g_GotKill[attacker][victim] = true;
     AddToPlayerStat(attacker, STAT_DAMAGE, damage);
   }
 
